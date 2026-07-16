@@ -4,6 +4,8 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit'
 import mainRouter from './routes/index.route.js';
+import { addCurrentDate } from './middlewares/date.middleware.js';
+import { logGetDate } from './middlewares/logGetDate.middleware.js';
 
 
 const app = express();
@@ -53,6 +55,10 @@ app.use(morgan('dev'));
 app.use(cors());
 
 app.use(express.json());
+
+app.use(addCurrentDate);
+
+app.use(logGetDate);
 
 app.use('/api', mainRouter);
 
