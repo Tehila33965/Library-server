@@ -3,9 +3,10 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit'
-import mainRouter from './routes/index.route.js';
 import { addCurrentDate } from './middlewares/date.middleware.js';
 import { logGetDate } from './middlewares/logGetDate.middleware.js';
+import { errorHandler, notFound } from './middlewares/errorHandler.middleware.js';
+import mainRouter from './routes/index.route.js';
 
 
 const app = express();
@@ -61,6 +62,10 @@ app.use(addCurrentDate);
 app.use(logGetDate);
 
 app.use('/api', mainRouter);
+
+app.use(notFound);
+
+app.use(errorHandler);
 
 app.get('/', (req, res) => {
     res.json('Welcome to the Library Server API!');
