@@ -3,8 +3,9 @@ export const errorHandler = (err, req, res, next) => {
     const statusCode = err.statusCode || err.status || 500;
     const errorResponse = {
         error: {
-            massage: err.message || 'Internal Server Error',
+            message: err.message || 'Internal Server Error',
             type: 'server error',
+            details: err.details || undefined
         }
     };
 
