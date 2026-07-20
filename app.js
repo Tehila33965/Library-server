@@ -7,9 +7,10 @@ import { addCurrentDate } from './middlewares/date.middleware.js';
 import { logGetDate } from './middlewares/logGetDate.middleware.js';
 import { errorHandler, notFound } from './middlewares/errorHandler.middleware.js';
 import mainRouter from './routes/index.route.js';
-
+import { connectDB } from './db.js';
 
 const app = express();
+
 
 /* 
   1. מידלוואר אבטחה: HELMET
@@ -61,16 +62,22 @@ app.use(addCurrentDate);
 
 app.use(logGetDate);
 
+app.get('/', (req, res) => {
+    res.json('Welcome to the Library Server API!');
+});
+
 app.use('/api', mainRouter);
 
 app.use(notFound);
 
 app.use(errorHandler);
 
-app.get('/', (req, res) => {
-    res.json('Welcome to the Library Server API!');
-});
+// app.listen(5000, () => {
+//     console.log('Server is running on http://localhost:5000');
+// });
 
-app.listen(5000, () => {
-    console.log('Server is running on http://localhost:5000');
+connectDB().then(() => {
+    app.listen(5000, () => {
+        console.log('Server is running on http://localhost:5000');
+    });
 });
