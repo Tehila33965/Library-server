@@ -1,67 +1,56 @@
-import { users } from "../users.js";
+import { User } from "../models/user.model.js";
 
-export const getAllUsers = (req, res, next) => {
+export const getAllUsers = async (req, res, next) => {
     try {
+        const users = await User.find();
         res.json(users);
     } catch (err) {
-        next(err);
+        next({ status: 500, error: err, type: 'server error' });
     }
 };
 
-export const signUp = (req, res, next) => {
+export const signUp = async (req, res, next) => {
     try {
-        const { username, email, password } = req.body;
+        const { name, email, phone, password } = req.body;
 
-        if (!username || !email || !password) {
-            const err = new Error('Username, email, and password are required');
-            err.statusCode = 400;
-            return next(err);
+        if (!name || !email || !phone || !password) {
+            return next({ status: 400, error: new Error('Name, email, phone, and password are required'), type: 'validation error' });
         }
 
-        const userExists = users.some(u => u.username === username || u.email === email);
+        const userExists = await User.findOne({ email });
         if (userExists) {
-            const err = new Error('Username or email already exists');
-            err.statusCode = 409;
-            return next(err);
+            return next({ status: 409, error: new Error('Email already exists'), type: 'conflict error' });
         }
 
-        const maxId = users.length > 0 ? Math.max(...users.map(u => u.id)) : 0;
-
-        const newUser = {
-            id: maxId + 1,
-            username,
+        const newUser = await User.create({
+            name,
             email,
-            password,
-            loanedBookIds: []
-        };
+            phone,
+            password
+        });
 
-        users.push(newUser);
         res.status(201).json({ message: 'User registered successfully', user: newUser });
     } catch (err) {
-        next(err);
+        next({ status: 500, error: err, type: 'server error' });
     }
 };
 
-export const signIn = (req, res, next) => {
+export const signIn = async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        const { email, password } = req.body;
 
-        if (!username || !password) {
-            const err = new Error('Username and password are required');
-            err.statusCode = 400;
-            return next(err);
+        if (!email || !password) {
+            return next({ status: 400, error: new Error('Email and password are required'), type: 'validation error' });
         }
 
-        const user = users.find(u => u.username === username && u.password === password);
+        const user = await User.findOne({ email, password });
 
         if (!user) {
-            const err = new Error('Invalid username or password');
-            err.statusCode = 401;
-            return next(err);
+            return next({ status: 401, error: new Error('Invalid email or password'), type: 'authentication error' });
         }
 
         res.json({ message: 'Login successful', user });
     } catch (err) {
-        next(err);
+        next({ status: 500, error: err, type: 'server error' });
     }
 };

@@ -24,27 +24,21 @@ export const getBookById = async (req, res, next) => {
     }
 };
 
+export const getBooksByCategory = async (req, res, next) => {
+    try {
+        const { category } = req.params;
+        const books = await Book.find({ category });
+        if (books.length === 0) {
+            return next({ status: 404, error: new Error(`No books found in category '${category}'`), type: 'not found' });
+        }
+        res.json(books);
+    } catch (err) {
+        next({ status: 500, error: err, type: 'server error' });
+    }
+};
+
 export const addBook = async (req, res, next) => {
     try {
-        // const { name, category, price } = req.body;
-
-        // if (!name || !category || price === undefined || isNaN(Number(price)) || Number(price) <= 0) {
-        //     const err = new Error('Missing or invalid fields. Name, category, and a positive price are required.');
-        //     err.statusCode = 400;
-        //     return next(err);
-        // }
-
-        // const maxId = books.length > 0 ? Math.max(...books.map(b => b.id)) : 0;
-
-        // const newBook = {
-        //     id: maxId + 1,
-        //     name,
-        //     category,
-        //     price: Number(price),
-        //     isLoaned: false,
-        //     loans: []
-        // };
-
         const newBook = new Book(req.body);
         await newBook.save();
         res.status(201).json(newBook);
