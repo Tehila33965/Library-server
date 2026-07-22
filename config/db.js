@@ -1,17 +1,15 @@
-import { connect } from "mongoose";
-import dotenv from "dotenv";
+import mongoose from "mongoose";
+import dns from "dns";
+import { env } from "./env.js";
 
-dotenv.config();
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 export const connectDB = async () => {
     try {
-        console.log('URI being used:', process.env.MONGO_URI);
-        await connect(process.env.MONGO_URI);
-        console.log('mongo connected succesfully');
+        await mongoose.connect(env.MONGO_URI);
+        console.log("MongoDB connected successfully");
     } catch (error) {
-        console.log(error);        
+        console.error(`Database connection error: ${error.message}`);
         process.exit(1);
     }
 };
-
-//connectDB();

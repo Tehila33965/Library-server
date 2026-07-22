@@ -7,11 +7,12 @@ import { addCurrentDate } from './middlewares/date.middleware.js';
 import { logGetDate } from './middlewares/logGetDate.middleware.js';
 import { errorHandler, notFound } from './middlewares/errorHandler.middleware.js';
 import mainRouter from './routes/index.route.js';
-import { connectDB } from './db.js';
+import { connectDB } from './config/db.js';
+import { env } from './config/env.js';
 
 const app = express();
 
-
+connectDB();
 /* 
   1. מידלוואר אבטחה: HELMET
   מוסיף כותרות אבטחה (Headers) לתשובות של השרת כדי להגן עליו מפני התקפות נפוצות.
@@ -72,12 +73,12 @@ app.use(notFound);
 
 app.use(errorHandler);
 
-// app.listen(5000, () => {
-//     console.log('Server is running on http://localhost:5000');
-// });
-
-connectDB().then(() => {
-    app.listen(5000, () => {
-        console.log('Server is running on http://localhost:5000');
-    });
+app.listen(env.PORT, () => {
+    console.log(`Server is running on http://localhost:${env.PORT}`);
 });
+
+// connectDB().then(() => {
+//     app.listen(5000, () => {
+//         console.log('Server is running on http://localhost:5000');
+//     });
+// });
